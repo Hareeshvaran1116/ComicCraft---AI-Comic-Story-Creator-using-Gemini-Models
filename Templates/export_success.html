@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Comic Exported Successfully! — ComicCraft AI{% endblock %}
+
+{% block content %}
+<div class="success-card">
+    <div class="celebration-icon">🎉</div>
+    
+    <h1 class="success-title">Comic Export Complete!</h1>
+    
+    <p class="success-desc">
+        Your AI comic book story and illustrations have been generated and packaged into a high-resolution PDF document.
+    </p>
+
+    <div class="success-actions">
+        {% if comic_id %}
+        <a href="/download/{{ comic_id }}" class="btn btn-primary" id="reDownloadBtn">
+            <span>📥</span> Download PDF Again
+        </a>
+        {% endif %}
+
+        <a href="/" class="btn btn-cyan" id="createAnotherBtn">
+            <span>✨</span> Go Create Another Comic
+        </a>
+    </div>
+</div>
+{% endblock %}

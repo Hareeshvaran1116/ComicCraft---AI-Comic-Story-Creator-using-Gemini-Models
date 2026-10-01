@@ -1,0 +1,85 @@
+import os
+from typing import Any
+
+try:
+    from google import genai
+except ImportError:
+    genai = None
+
+
+def _get_prompt_text(prompt: Any) -> str:
+    """
+    Convert either a normal string or a PromptRequest-like object
+    into plain text.
+    """
+
+    if isinstance(prompt, str):
+        return prompt.strip()
+
+    if hasattr(prompt, "prompt"):
+        value = getattr(prompt, "prompt")
+        return str(value).strip() if value is not None else ""
+
+    if isinstance(prompt, dict):
+        value = prompt.get("prompt", "")
+        return str(value).strip()
+
+    return str(prompt).strip()
+
+
+def generate_outline(prompt: Any, **kwargs: Any) -> str:
+    """Generate a comic outline using Gemini or a local fallback."""
+
+    prompt_text = _get_prompt_text(prompt)
+
+    api_key = os.getenv("GEMINI_API_KEY")
+
+    if genai is None or not api_key:
+        return _fallback_outline(prompt_text)
+
+    try:
+        client = genai.Client(api_key=api_key)
+
+        response = client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=(
+                "Create a short comic outline from the following idea. "
+                "Include a beginning, middle, and ending.\n\n"
+                f"Comic idea: {prompt_text}"
+            ),
+        )
+
+        text = getattr(response, "text", None)
+
+        if text:
+            return text
+
+    except Exception as exc:
+        print(f"Gemini Flash error: {exc}")
+
+    return _fallback_outline(prompt_text)
+
+
+def _fallback_outline(prompt: str) -> str:
+    """Create a local outline when Gemini is unavailable."""
+
+    prompt_text = str(prompt).strip() if prompt else ""
+
+    title = (
+        prompt_text[:60]
+        if prompt_text
+        else "Untitled Adventure"
+    )
+
+    return (
+        f"Comic Title: {title}\n\n"
+        "Act 1 — Setup:\n"
+        "Introduce the main character and the central situation.\n\n"
+        "Act 2 — Conflict:\n"
+        "The character encounters an unexpected challenge.\n\n"
+        "Act 3 — Resolution:\n"
+        "The character solves the problem and reaches a satisfying ending."
+    )
+
+
+__all__ = ["generate_outline"]

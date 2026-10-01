@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block title %}ComicCraft AI — Create Your AI Comic Strip{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-tag">
+        <span>✨</span> Next-Gen Generative Comic Studio
+    </div>
+    <h1 class="hero-title">
+        Turn Any Idea Into A <span class="gradient-text">Visual Comic</span>
+    </h1>
+    <p class="hero-desc">
+        Powered by Google Gemini 1.5 Flash for outlines, Gemini 1.5 Pro for rich dialogues, and Stable Diffusion for stunning comic panel illustrations.
+    </p>
+
+    <!-- Quick Inspiration Chips -->
+    <div class="quick-prompts-wrap">
+        <span class="quick-prompts-label">Try a story prompt preset:</span>
+        <div class="prompt-chips">
+            <button type="button" class="prompt-chip" onclick="fillPreset('fox')">🦊 Brave Fox & Enchanted Forest</button>
+            <button type="button" class="prompt-chip" onclick="fillPreset('cyber')">🤖 Cyberpunk Detective in Neo-Tokyo</button>
+            <button type="button" class="prompt-chip" onclick="fillPreset('space')">🚀 Space Explorer & Ancient Star</button>
+            <button type="button" class="prompt-chip" onclick="fillPreset('dragon')">🐉 Apprentice at Dragon Academy</button>
+        </div>
+    </div>
+</section>
+
+<!-- Creator Studio Form Card -->
+<div class="creator-card">
+    <form id="comicForm" action="/generate" method="post" onsubmit="showLoading()">
+        <div class="form-grid">
+            
+            <!-- Story Prompt -->
+            <div class="form-group">
+                <label class="form-label" for="story_prompt">
+                    Story Prompt
+                    <span class="form-label-hint">What is your comic about?</span>
+                </label>
+                <textarea 
+                    id="story_prompt" 
+                    name="story_prompt" 
+                    class="form-textarea" 
+                    required 
+                    placeholder="Describe your story idea... (e.g., A young brave fox named Nova embarks on a journey into an enchanted forest to find a legendary star crystal...)"
+                    rows="3"
+                ></textarea>
+            </div>
+
+            <!-- Character & Setting Grid -->
+            <div class="grid-2">
+                <div class="form-group">
+                    <label class="form-label" for="character_name">
+                        Main Character Name
+                    </label>
+                    <input 
+                        type="text" 
+                        id="character_name" 
+                        name="character_name" 
+                        class="form-input" 
+                        required 
+                        placeholder="e.g. Nova, Jax, Lyra"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="setting">
+                        Setting / World
+                    </label>
+                    <input 
+                        type="text" 
+                        id="setting" 
+                        name="setting" 
+                        class="form-input" 
+                        required 
+                        placeholder="e.g. Enchanted forest, Neon City, Orbital Station"
+                    >
+                </div>
+            </div>
+
+            <!-- Tone, Art Style & Panels Grid -->
+            <div class="grid-3">
+                <div class="form-group">
+                    <label class="form-label" for="tone">Story Tone</label>
+                    <select id="tone" name="tone" class="form-select">
+                        <option value="light-hearted" selected>Light-Hearted</option>
+                        <option value="dramatic">Dramatic</option>
+                        <option value="funny">Funny & Comedic</option>
+                        <option value="poetic">Poetic & Mystical</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="art_style">Art Style</label>
+                    <select id="art_style" name="art_style" class="form-select">
+                        <option value="comic book" selected>Classic Comic Book</option>
+                        <option value="anime">Anime / Manga</option>
+                        <option value="pixel art">Pixel Art</option>
+                        <option value="realistic">Cinematic Realistic</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="panels">Panels Count</label>
+                    <input 
+                        type="number" 
+                        id="panels" 
+                        name="panels" 
+                        class="form-input" 
+                        min="3" 
+                        max="8" 
+                        value="5"
+                    >
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" id="submitBtn" class="btn btn-primary btn-block" style="margin-top: 1rem;">
+                <span>⚡</span> Generate Comic Strip
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Dynamic Generation Loading Overlay -->
+<div id="loadingOverlay" class="loading-overlay">
+    <div class="loading-content">
+        <div class="comic-spinner"></div>
+        <h2 class="loading-title">Crafting Your Comic...</h2>
+        <p id="loadingStatus" class="loading-step-text">Initializing AI models...</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const presets = {
+        fox: {
+            prompt: "A young brave fox exploring an ancient enchanted forest discovers a glowing celestial relic that reveals a map to forgotten worlds.",
+            character: "Nova the Fox",
+            setting: "Enchanted Whispering Forest",
+            tone: "light-hearted",
+            style: "comic book",
+            panels: 5
+        },
+        cyber: {
+            prompt: "A rogue cybernetic detective follows holographic clues through rain-slicked alleyways to solve a mysterious data heist.",
+            character: "Detective Vance",
+            setting: "Neo-Tokyo 2099",
+            tone: "dramatic",
+            style: "anime",
+            panels: 5
+        },
+        space: {
+            prompt: "An energetic spaceship pilot encounters a playful cosmic being living inside an abandoned stellar lighthouse.",
+            character: "Captain Lyra",
+            setting: "Andromeda Nebula Station",
+            tone: "funny",
+            style: "comic book",
+            panels: 5
+        },
+        dragon: {
+            prompt: "A determined young apprentice discovers their dormant magic while soothing a hatchling dragon during the grand eclipse.",
+            character: "Kaelen",
+            setting: "Skyhold Dragon Sanctuary",
+            tone: "poetic",
+            style: "anime",
+            panels: 5
+        }
+    };
+
+    function fillPreset(key) {
+        const p = presets[key];
+        if (!p) return;
+        document.getElementById('story_prompt').value = p.prompt;
+        document.getElementById('character_name').value = p.character;
+        document.getElementById('setting').value = p.setting;
+        document.getElementById('tone').value = p.tone;
+        document.getElementById('art_style').value = p.style;
+        document.getElementById('panels').value = p.panels;
+    }
+
+    function showLoading() {
+        const overlay = document.getElementById('loadingOverlay');
+        const status = document.getElementById('loadingStatus');
+        overlay.style.display = 'flex';
+
+        const steps = [
+            "⚡ Connecting to Google Gemini Flash for 5-panel outline...",
+            "✍️ Calling Gemini Pro to craft dialogue and narration...",
+            "🎨 Generating comic panel artwork and illustrations...",
+            "📐 Building structured panel layout...",
+            "📄 Compiling your downloadable PDF comic book..."
+        ];
+
+        let stepIndex = 0;
+        setInterval(() => {
+            stepIndex = (stepIndex + 1) % steps.length;
+            status.textContent = steps[stepIndex];
+        }, 3200);
+    }
+</script>
+{% endblock %}

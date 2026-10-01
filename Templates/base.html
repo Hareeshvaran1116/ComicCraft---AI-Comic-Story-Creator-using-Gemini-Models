@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ComicCraft AI — AI Comic Story Creator{% endblock %}</title>
+    <meta name="description" content="Turn any story prompt into a multi-panel AI comic strip with Google Gemini and Stable Diffusion. Generate narratives, dialogues, art, and download PDF comics.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💥</text></svg>">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="comic-texture"></div>
+
+    <!-- Header / Navbar -->
+    <header class="navbar">
+        <div class="nav-container">
+            <a href="/" class="brand" id="nav-brand-link">
+                <div class="brand-icon">CC</div>
+                <div class="brand-text">Comic<span>Craft</span> AI</div>
+            </a>
+            <nav class="nav-links">
+                <a href="/" class="nav-link" id="nav-create-link">Create Comic</a>
+                <a href="/docs" class="nav-link" id="nav-docs-link" target="_blank">API Docs</a>
+                <a href="/health" class="nav-link" id="nav-health-link" target="_blank">Health</a>
+                <span class="nav-badge">
+                    <span>⚡</span> Gemini 1.5 + SD
+                </span>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-wrapper" id="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p class="footer-text">
+            ComicCraft AI &bull; Built with <strong>Google Gemini</strong> & <strong>Stable Diffusion</strong> on FastAPI.
+        </p>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

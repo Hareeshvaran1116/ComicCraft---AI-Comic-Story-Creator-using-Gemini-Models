@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}ComicCraft AI — Error{% endblock %}
+
+{% block content %}
+<div class="success-card" style="border-color: rgba(239, 68, 68, 0.4);">
+    <div class="celebration-icon" style="background: linear-gradient(135deg, #ef4444, #f59e0b);">⚠️</div>
+    
+    <h1 class="success-title">Oops! Something Went Wrong</h1>
+    
+    <p class="success-desc" style="color: #fca5a5;">
+        {{ message }}
+    </p>
+
+    <div class="success-actions">
+        <a href="/" class="btn btn-primary">
+            <span>🔄</span> Try Again
+        </a>
+    </div>
+</div>
+{% endblock %}
